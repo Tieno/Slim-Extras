@@ -55,7 +55,14 @@ class TwigView extends Slim_View {
      * @var TwigExtension The Twig extensions you want to load
      */
     public static $twigExtensions = array();
-
+	
+	/**
+     * @var TwigFunction the custom functions you want to load
+     * @param functionName alias for the function
+     * @param function the actual function (can be a static class method)
+     */
+   	public static $twigFunctions = array();
+    
     /**
      * @var TwigEnvironment The Twig environment for rendering templates.
      */
@@ -74,6 +81,13 @@ class TwigView extends Slim_View {
         $template = $env->loadTemplate($template);
         return $template->render($this->data);
     }
+	
+	public function getRender($template, $data) {
+	    	$env = $this->getEnvironment();
+	    	$template = $env->loadTemplate($template);
+	    	$data = array_merge($data, $this->data);
+	    	return $template->render($data);
+	}
 
     /**
      * Creates new TwigEnvironment if it doesn't already exist, and returns it.
@@ -93,6 +107,9 @@ class TwigView extends Slim_View {
                 $loader,
                 self::$twigOptions
             );
+			foreach (self::$twigFunctions as $function) {
+		            	$this->twigEnvironment->addFunction($function['functionName'], new Twig_Function_Function($function['function']));
+					}
 
             // Check for Composer Package Autoloader class loading
             if (!class_exists('Twig_Extensions_Autoloader')) {
