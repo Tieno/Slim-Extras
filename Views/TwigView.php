@@ -81,7 +81,15 @@ class TwigView extends Slim_View {
         $template = $env->loadTemplate($template);
         return $template->render($this->data);
     }
+     
+    public function getRender($template, $data) {
+    	$env = $this->getEnvironment();
+    	$template = $env->loadTemplate($template);
+    	$data = array_merge($data, $this->data);
+    	return $template->render($data);
+    }
 
+	
     /**
      * Creates new TwigEnvironment if it doesn't already exist, and returns it.
      *
